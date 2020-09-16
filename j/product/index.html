@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách phòng</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body onload="getRoomInfor()">
+
+    <table class="table table-stripped">
+        <thead>
+            <th>Id</th>
+            <th>CateroryId</th>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Price</th>
+            <th>Detail</th>
+            <th>View</th>
+            <th>
+                <a href="add-cate.html" class="btn btn-sm btn-success">Thêm mới</a>
+            </th>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        var apiUrl = 'https://5e9eeb3711b078001679bd29.mockapi.io/categories';
+
+        var hotelInfo = {};
+        //var id = null;
+        function getRoomInfor(){
+            // 1. lấy tham số id trên đường dẫn
+            const urlParams = new URLSearchParams(window.location.search);
+            id = urlParams.get('id');
+            // 2. gửi request lên mock api để lấy thông tin của khách sạn về
+            const getRoomInfoUrl = apiUrl + "/" + id + "/" +"products";
+            axios.get(getRoomInfoUrl)
+        .then(res => {
+            if(res.statusText === "OK"){
+                document.querySelector('tbody').innerHTML = '';
+                var data = res.data;
+                var content = ``;
+                data.forEach(element => {
+                   content += `<tr id="row-${element.id}">
+                                    <td>${element.id}</td>
+                                    <td>${element.categoryId}</td>
+                                    <td>${element.name}</td>
+                                    <td>
+                                        <img src="${element.image}" width="100px" class="img img-avatar"/>
+                                    </td>
+                                    
+                                    <td>${element.price}</td>
+                                      <td>${element.detail}</td>
+                                        <td>${element.view}</td>
+                                    <td>
+                                        <a href="edit-rooms.html?id=${element.id}&hotelId=${element.hotelId}" class="btn btn-sm btn-primary">Sửa</a>
+                                           
+                                        <button class="btn btn-sm btn-danger"  onclick="removeElement(${element.id})">Xóa</button>  
+                                    </td>
+                    
+                                </tr>`;
+                });
+                document.querySelector('tbody').innerHTML = content;
+            }
+        })
+        }
+        
+        function removeElement(removeId){
+            // 1. lấy tham số id trên đường dẫn
+            const urlParams = new URLSearchParams(window.location.search);
+            id = urlParams.get('id');
+            // 2. gửi request lên mock api để lấy thông tin của khách sạn về
+            const getRoomInfoUrl = apiUrl + "/" + id + "/" +"products";
+            Swal.fire({
+            title: 'Chắc chắn xóa?',
+            text: "Sau khi xóa sẽ ko lấy lại đk!",
+            icon: 'er',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: 'ko đồng ý',
+            confirmButtonText: 'Đồng ý!'
+            }).then((result) => {
+            if (result.value) {
+                // gửi lên sever
+                var deleteUrl = getRoomInfoUrl +"/" +removeId;
+                axios.delete(deleteUrl)
+                .then(response =>{
+                    console.log(response);
+                })
+                .then(() => {
+                    var removeElement = document.querySelector('#row-'+removeId);
+                    removeElement.remove();
+                })
+           
+    
+            }
+            })
+        }
+
+        // hiển thị khách sạn
+        function showHotel(){
+        axios.get(apiUrl)
+        .then(response=>{
+            if(response.statusText === "OK"){
+                document.querySelector('select').innerHTML = '';
+                var data = response.data;
+                var content = ``;
+                data.forEach(elementHotel => {
+                    content += 
+                    `<option value="${elementHotel.id}">${elementHotel.name}</option>`;
+                });
+                document.querySelector('select').innerHTML = content;
+            }
+        })    
+        }
+        
+    </script>
+</body>
+</html>

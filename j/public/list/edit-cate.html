@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm mới khách sạn</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body onload="getHotelInfor()">
+    <!-- form tạo mới hotel -->
+    <div class="container">
+        <br>
+        <h2>Cập nhật thông tin khách sạn</h2>
+        <div class="row">
+            <div class="col-6 offset-3">
+                <form onsubmit="return editHotel()">
+                    <div class="form-group">
+                        <label for="">Tên danh mục</label>
+                        <input type="text" name="name" class="form-control">
+                    </div>
+                   
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-sm btn-primary">Lưu</button>&nbsp;
+                        <a href="index.html" class="btn btn-sm btn-danger">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+     const apiUrl = 'https://5e9eeb3711b078001679bd29.mockapi.io/categories';
+        var hotelInfo = {};
+        var id = null;
+        function getHotelInfor(){
+            // 1. lấy tham số id trên đường dẫn
+            const urlParams = new URLSearchParams(window.location.search);
+            id = urlParams.get('id');
+            // 2. gửi request lên mock api để lấy thông tin của khách sạn về
+            const getHotelInfoUrl = apiUrl + "/" + id;
+            axios.get(getHotelInfoUrl)
+            .then(res => {
+                if(res.statusText === "OK"){
+                    hotelInfo = res.data;
+                    // 3. điền dữ liệu lấy đc từ api vào trong form
+                    document.querySelector('[name="name"]').value = hotelInfo.name;
+                  
+                }
+            })
+            
+        }
+        
+        function editHotel(){
+            const name = document.querySelector('[name="name"]').value;
+         
+            hotelInfo.name = name;
+         
+            // gửi request lên mockapi để thêm khách sạn
+            const updateHotelUrl = apiUrl + "/" + id;
+            axios.put(updateHotelUrl, hotelInfo)
+            .then(data => {
+                if(data.statusText === "OK"){
+                    window.location.href = 'index.html';
+                }
+            })
+            return false;
+        }
+    </script>
+</body>
+</html>
